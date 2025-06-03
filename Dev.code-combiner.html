@@ -1,0 +1,668 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Dev.code-combiner</title>
+<style></style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Playground</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #f4f6f8;
+        color: #1a1a1a;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        background: #ffffff;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+      }
+
+      .header-buttons {
+        flex: 1;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .header-buttons button {
+        flex: 1;
+        /* 🔥 Each button takes equal width */
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+
+      .header-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      button {
+        background: #0066cc;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background: #0052a3;
+      }
+
+      button.secondary {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      button.secondary:hover {
+        background: #d0d0d0;
+      }
+
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 1rem;
+        gap: 1rem;
+        flex: 1;
+      }
+
+      .editor-pane,
+      .preview-pane {
+        flex: 1 1 400px;
+        max-width: 100%;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      }
+
+      .editor-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+        position: relative;
+      }
+
+      .editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.4rem;
+      }
+
+      .editor-actions {
+        display: flex;
+        gap: 0.3rem;
+      }
+
+      .editor-actions button {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      label {
+        font-weight: 500;
+      }
+
+      textarea {
+        flex: 1;
+        font-family: monospace;
+        font-size: 0.95rem;
+        padding: 0.6rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .collapsed textarea {
+        min-height: 0;
+        height: 30px !important;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      iframe {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        min-height: 300px;
+        background: #fff;
+      }
+
+      /* Fullscreen editor styles */
+      .fullscreen-editor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: white;
+        z-index: 1000;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .fullscreen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 1rem;
+      }
+
+      .fullscreen-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .fullscreen-textarea {
+        flex: 1;
+        width: 100%;
+        font-family: monospace;
+        font-size: 1rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        resize: none;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 1.2rem;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .credits-box {
+        background: #ffffff;
+        color: #333;
+        padding: 0.7em 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-size: 0.8rem;
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      /* ✅ Fix for horizontal scroll issue */
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
+      /* ✅ Fix .editor-pane and .preview-pane from going too wide */
+      .editor-pane,
+      .preview-pane {
+        max-width: 100%;
+        min-width: 0;
+      }
+
+      /* ✅ Fix header buttons from going outside container */
+      .header-buttons {
+        flex-wrap: wrap;
+        max-width: 100%;
+        justify-content: flex-end;
+      }
+
+      /* ✅ Improve button layout on small screens */
+      @media (max-width: 768px) {
+        .header-buttons {
+          justify-content: center;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      @media (max-width: 768px) {
+        main {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-buttons">
+        <h1> 3 Into 1 Code Combiner </h1>
+        <button id="saveBtn" class="secondary">Save</button>
+        <button id="loadBtn" class="secondary">Load</button>
+        <button id="openInNewBtn">Open Preview</button>
+      </div>
+    </header>
+    <div class="main-wrapper">
+      <main>
+        <div class="editor-pane">
+          <div class="editor-group" id="htmlGroup">
+            <div class="editor-header">
+              <label for="htmlCode">HTML</label>
+              <div class="editor-actions">
+                <button class="secondary paste-btn" data-target="htmlCode">Paste</button>
+                <button class="secondary expand-btn" data-target="htmlCode">Fullscreen</button>
+              </div>
+            </div>
+            <textarea id="htmlCode" placeholder="Enter HTML code here..."></textarea>
+          </div>
+          <div class="editor-group" id="cssGroup">
+            <div class="editor-header">
+              <label for="cssCode">CSS</label>
+              <div class="editor-actions">
+                <button class="secondary paste-btn" data-target="cssCode">Paste</button>
+                <button class="secondary expand-btn" data-target="cssCode">Fullscreen</button>
+              </div>
+            </div>
+            <textarea id="cssCode" placeholder="Enter CSS code here..."></textarea>
+          </div>
+          <div class="editor-group" id="jsGroup">
+            <div class="editor-header">
+              <label for="jsCode">JavaScript</label>
+              <div class="editor-actions">
+                <button class="secondary paste-btn" data-target="jsCode">Paste</button>
+                <button class="secondary expand-btn" data-target="jsCode">Fullscreen</button>
+              </div>
+            </div>
+            <textarea id="jsCode" placeholder="Enter JavaScript code here..."></textarea>
+          </div>
+        </div>
+        <div class="preview-pane">
+          <div class="preview-header">
+            <span>Live Preview</span>
+            <button id="downloadBtn">Download</button>
+          </div>
+          <iframe id="preview" sandbox="allow-scripts"></iframe>
+        </div>
+      </main>
+    </div>
+    <!-- Fullscreen Editor (hidden by default) -->
+    <div id="fullscreenEditor" class="fullscreen-editor" style="display: none;">
+      <div class="fullscreen-header">
+        <h2 id="fullscreenTitle">Editor</h2>
+        <button id="exitFullscreenBtn" class="secondary">Back to Editor</button>
+      </div>
+      <div class="fullscreen-content">
+        <textarea id="fullscreenTextarea" class="fullscreen-textarea"></textarea>
+      </div>
+    </div>
+    <!-- Download Modal -->
+    <div class="modal" id="downloadModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Download Project</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input type="text" id="projectName" placeholder="Enter project name">
+        </div>
+        <div class="modal-actions">
+          <button class="secondary" id="cancelDownload">Cancel</button>
+          <button id="confirmDownload">Download</button>
+        </div>
+      </div>
+    </div>
+    <!-- Save Modal -->
+    <div class="modal" id="saveModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Save Project</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="saveProjectName">Project Name</label>
+          <input type="text" id="saveProjectName" placeholder="Enter project name">
+        </div>
+        <div class="modal-actions">
+          <button class="secondary" id="cancelSave">Cancel</button>
+          <button id="confirmSave">Save</button>
+        </div>
+      </div>
+    </div>
+    <!-- Load Modal -->
+    <div class="modal" id="loadModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Load Project</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="savedProjects">Select Project</label>
+          <select id="savedProjects" class="form-control">
+            <option value="">-- Select a project --</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary" id="cancelLoad">Cancel</button>
+          <button id="confirmLoad">Load</button>
+        </div>
+      </div>
+    </div>
+    <footer class="credits-box">
+      <div>Made by</div>
+      <strong>❤️ Divyansh ❤️</strong>
+    </footer>
+    <script>
+      const htmlCode = document.getElementById('htmlCode');
+      const cssCode = document.getElementById('cssCode');
+      const jsCode = document.getElementById('jsCode');
+      const preview = document.getElementById('preview');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const openInNewBtn = document.getElementById('openInNewBtn');
+      const saveBtn = document.getElementById('saveBtn');
+      const loadBtn = document.getElementById('loadBtn');
+      // Fullscreen editor elements
+      const fullscreenEditor = document.getElementById('fullscreenEditor');
+      const fullscreenTextarea = document.getElementById('fullscreenTextarea');
+      const fullscreenTitle = document.getElementById('fullscreenTitle');
+      const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+      // Modal elements
+      const downloadModal = document.getElementById('downloadModal');
+      const saveModal = document.getElementById('saveModal');
+      const loadModal = document.getElementById('loadModal');
+      const projectNameInput = document.getElementById('projectName');
+      const saveProjectNameInput = document.getElementById('saveProjectName');
+      const savedProjectsSelect = document.getElementById('savedProjects');
+      // Buttons
+      const confirmDownload = document.getElementById('confirmDownload');
+      const cancelDownload = document.getElementById('cancelDownload');
+      const confirmSave = document.getElementById('confirmSave');
+      const cancelSave = document.getElementById('cancelSave');
+      const confirmLoad = document.getElementById('confirmLoad');
+      const cancelLoad = document.getElementById('cancelLoad');
+      // Close buttons
+      const closeButtons = document.querySelectorAll('.close-modal');
+      // Current editor in fullscreen mode
+      let currentFullscreenEditor = null;
+      // Wait for DOM to be fully loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the projects list
+        updateProjectsList();
+        // Initialize preview
+        updatePreview();
+        // Event Listeners
+        [htmlCode, cssCode, jsCode].forEach(el => {
+          el.addEventListener('input', () => {
+            clearTimeout(window.debounce);
+            window.debounce = setTimeout(updatePreview, 300);
+          });
+        });
+        downloadBtn.addEventListener('click', () => showModal(downloadModal));
+        openInNewBtn.addEventListener('click', openInNewTab);
+        saveBtn.addEventListener('click', () => showModal(saveModal));
+        loadBtn.addEventListener('click', () => {
+          updateProjectsList();
+          showModal(loadModal);
+        });
+        confirmDownload.addEventListener('click', downloadCombined);
+        cancelDownload.addEventListener('click', () => hideModal(downloadModal));
+        confirmSave.addEventListener('click', saveProject);
+        cancelSave.addEventListener('click', () => hideModal(saveModal));
+        confirmLoad.addEventListener('click', loadProject);
+        cancelLoad.addEventListener('click', () => hideModal(loadModal));
+        closeButtons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            hideModal(this.closest('.modal'));
+          });
+        });
+        // Handle editor actions
+        document.querySelectorAll('.expand-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const target = this.getAttribute('data-target');
+            openFullscreenEditor(target);
+          });
+        });
+        document.querySelectorAll('.paste-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const target = this.getAttribute('data-target');
+            pasteToEditor(target);
+          });
+        });
+        // Fullscreen editor events
+        exitFullscreenBtn.addEventListener('click', closeFullscreenEditor);
+        fullscreenTextarea.addEventListener('input', function() {
+          if (currentFullscreenEditor) {
+            clearTimeout(window.debounce);
+            window.debounce = setTimeout(updatePreview, 300);
+          }
+        });
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+          if (e.target.classList.contains('modal')) {
+            hideModal(e.target);
+          }
+        });
+      });
+
+      function getCombinedCode() {
+        return `
+
+					<!DOCTYPE html>
+					<html lang="en">
+						<head>
+							<meta charset="UTF-8" />
+							<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+							<title>${projectNameInput.value || 'Code Playground Project'}</title>
+							<style>${cssCode.value}</style>
+						</head>
+						<body>
+${htmlCode.value}
+
+							<script>${jsCode.value}<\/script>
+							</body>
+						</html>`;
+      }
+
+      function updatePreview() {
+        const blob = new Blob([getCombinedCode()], {
+          type: 'text/html'
+        });
+        const url = URL.createObjectURL(blob);
+        preview.src = url;
+        preview.onload = () => URL.revokeObjectURL(url);
+      }
+
+      function downloadCombined() {
+        const blob = new Blob([getCombinedCode()], {
+          type: 'text/html'
+        });
+        const fileName = projectNameInput.value ? `${projectNameInput.value}.html` : 'code-playground.html';
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        downloadModal.style.display = 'none';
+      }
+
+      function openInNewTab() {
+        const blob = new Blob([getCombinedCode()], {
+          type: 'text/html'
+        });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      }
+
+      function openFullscreenEditor(textareaId) {
+        const textarea = document.getElementById(textareaId);
+        currentFullscreenEditor = textareaId;
+        fullscreenTextarea.value = textarea.value;
+        fullscreenTitle.textContent = textareaId.replace('Code', '').toUpperCase() + ' Editor';
+        fullscreenEditor.style.display = 'flex';
+        fullscreenTextarea.focus();
+        document.querySelector('header').style.display = 'none';
+        document.querySelector('main').style.display = 'none';
+      }
+
+      function closeFullscreenEditor() {
+        if (currentFullscreenEditor) {
+          document.getElementById(currentFullscreenEditor).value = fullscreenTextarea.value;
+          updatePreview();
+        }
+        fullscreenEditor.style.display = 'none';
+        currentFullscreenEditor = null;
+        document.querySelector('header').style.display = 'flex';
+        document.querySelector('main').style.display = 'flex';
+      }
+      async function pasteToEditor(targetId) {
+        try {
+          const text = await navigator.clipboard.readText();
+          document.getElementById(targetId).value = text;
+          updatePreview();
+        } catch (err) {
+          alert('Failed to read clipboard contents. Please make sure you have granted clipboard permissions.');
+          console.error('Failed to read clipboard contents:', err);
+        }
+      }
+
+      function saveProject() {
+        const projectName = saveProjectNameInput.value.trim();
+        if (!projectName) {
+          alert('Please enter a project name');
+          return;
+        }
+        const projectData = {
+          name: projectName,
+          html: htmlCode.value,
+          css: cssCode.value,
+          js: jsCode.value,
+          timestamp: new Date().toISOString()
+        };
+        let projects = JSON.parse(localStorage.getItem('codePlaygroundProjects') || '[]');
+        const existingIndex = projects.findIndex(p => p.name === projectName);
+        if (existingIndex >= 0) {
+          projects[existingIndex] = projectData;
+        } else {
+          projects.push(projectData);
+        }
+        localStorage.setItem('codePlaygroundProjects', JSON.stringify(projects));
+        saveModal.style.display = 'none';
+        alert('Project saved successfully!');
+        updateProjectsList();
+      }
+
+      function loadProject() {
+        const selectedProjectName = savedProjectsSelect.value;
+        if (!selectedProjectName) return;
+        const projects = JSON.parse(localStorage.getItem('codePlaygroundProjects') || '[]');
+        const project = projects.find(p => p.name === selectedProjectName);
+        if (project) {
+          htmlCode.value = project.html;
+          cssCode.val
+<script></script>
+</body>
+</html>
